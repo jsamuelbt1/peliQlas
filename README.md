@@ -1,4 +1,4 @@
-# samdrenalyn-provisional-
+# PeliQlas-
 proyecto de películas holaa
 
 Flujo 1. Inicio → lista de películas → detalle.
