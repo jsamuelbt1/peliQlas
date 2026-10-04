@@ -59,7 +59,20 @@ Para mantener una arquitectura limpia y escalable en SwiftUI, los datos se organ
   * La lista de películas favoritas se almacenará mediante un gestor de persistencia local (como *SwiftData* o un gestor local envuelto en un observable). Esto permite que tanto la pantalla de inicio como la de detalle consulten y modifiquen la misma "fuente de verdad" en tiempo real sin perder los datos al cerrar la app.
  
 
+---
+<img width="678" height="385" alt="Screenshot 2026-10-03 at 20 15 36" src="https://github.com/user-attachments/assets/0ba7c5d2-aa34-4fb6-b1aa-bf4e5d8ea065" />
 
+## 4. Flujo y Pantalla de Búsqueda 
+
+### Vista de Resultados de Búsqueda (`SearchView`)
+* **Qué muestra:** Una barra de búsqueda superior activa con el texto ingresado por el usuario (ej. *"una película de huevos"*), el encabezado de sección *"Resultados"*, y una lista vertical de tarjetas que muestran el póster, el título oficial, el año de estreno, los géneros y el botón de favoritos de cada coincidencia encontrada[cite: 2].
+* **Qué recibe:** El parámetro de consulta ingresado por el usuario y el servicio de red de TMDB para realizar el filtrado dinámico.
+* **Qué modifica (Estado local / `@State`):** El texto de búsqueda en tiempo real (`searchQuery`), la lista de películas filtradas devueltas por la API y el estado visual individual de los botones de favorito en cada celda[cite: 2].
+* **Qué necesita conservar:** El historial temporal de la consulta y la sincronización con la base de datos local de favoritos.
+
+### Estrategia de Navegación para la Búsqueda
+* **Transición desde el Inicio:** Al hacer *tap* sobre la barra de búsqueda en la **Pantalla de Inicio**, la aplicación despliega la vista de búsqueda (ya sea mediante una transición modal o un contenedor de navegación integrado).
+* **Navegación al Detalle:** Al igual que en el flujo principal, cada tarjeta de resultado en la **Vista de Búsqueda** funciona como un elemento interactivo envuelto en el `NavigationStack`, permitiendo al usuario navegar directamente hacia la **Vista de Detalle** (`MovieDetailView`) de la película seleccionada.
 
 
 
