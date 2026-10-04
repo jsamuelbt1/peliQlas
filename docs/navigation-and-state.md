@@ -75,6 +75,16 @@ Para mantener una arquitectura limpia y escalable en SwiftUI, los datos se organ
 * **Navegación al Detalle:** Al igual que en el flujo principal, cada tarjeta de resultado en la **Vista de Búsqueda** funciona como un elemento interactivo envuelto en el `NavigationStack`, permitiendo al usuario navegar directamente hacia la **Vista de Detalle** (`MovieDetailView`) de la película seleccionada.
 
 
+<img width="276" height="478" alt="Screenshot 2026-10-03 at 20 31 37" src="https://github.com/user-attachments/assets/5e727f7c-faa0-459d-ba91-7f041b0b99ff" />
+
+
+### Vista de Búsqueda Sin Resultados (`NoResultsView`)
+* **Qué muestra:** El encabezado de la sección de resultados acompañado de un mensaje claro de estado vacío que indica *"No se encontraron resultados para:"* seguido de la consulta exacta ingresada por el usuario (ej. *"blablablablal xdxdxdP"*)[cite: 3].
+* **Qué receives (`let`):** El texto de la consulta fallida ingresada en la barra de búsqueda superior.
+* **Qué modifica (Estado local / `@State`):** El texto dinámico que refleja la búsqueda no encontrada y la visibilidad del componente de estado vacío frente a la lista de resultados regulares[cite: 3].
+* **Qué necesita conservar:** El estado activo de la barra de búsqueda para permitir al usuario corregir el texto o realizar una nueva consulta sin perder el flujo de navegación.
+
+
 
 
 
