@@ -73,19 +73,19 @@ La View conoce al ViewModel y el ViewModel conoce al Model, pero **el ViewModel 
 
 ## 9. Propuesta inicial de organización con MVVM
 Model
-Movie: título, año, géneros, calificación, director, actores e imagen.
-Profile: nombre del perfil de usuario.
+**Movie: título, año, géneros, calificación, director, actores e imagen.
+**Profile: nombre del perfil de usuario.
 View
-WelcomeView: selección de perfil y botón para entrar.
-MovieListView: buscador y lista de películas.
-MovieDetailView: información completa de la película, botón de favorito y botón para regresar.
-PosterView: componente reutilizable para mostrar el póster.
-Responsabilidades que podrían vivir fuera de las View
-Filtrar películas según el texto de búsqueda.
-Consultar y modificar favoritos.
-Guardar el perfil seleccionado.
-Dar formato a los textos que se muestran.
-Obtener la lista de películas (hoy local, en el futuro desde una API).
+**WelcomeView: selección de perfil y botón para entrar.
+**MovieListView: buscador y lista de películas.
+**MovieDetailView: información completa de la película, botón de favorito y botón para regresar.
+**PosterView: componente reutilizable para mostrar el póster.
+**Responsabilidades que podrían vivir fuera de las View
+**Filtrar películas según el texto de búsqueda.
+**Consultar y modificar favoritos.
+**Guardar el perfil seleccionado.
+**Dar formato a los textos que se muestran.
+**Obtener la lista de películas (hoy local, en el futuro desde una API).
 
 
 
