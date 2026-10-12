@@ -1,7 +1,6 @@
-Práctica 4 Navegación, estado compartido y propuesta de arquitectura
-MVVM y arquitectura
+## Práctica 4 Navegación, estado compartido y propuesta de arquitectura MVVM y arquitectura
 
-1. ¿Por qué es conveniente separar responsabilidades dentro de una aplicación?
+## 1. ¿Por qué es conveniente separar responsabilidades dentro de una aplicación?
 
 Separar responsabilidades significa que cada parte de una aplicación tenga una sola tarea clara. Esto es conveniente porque:
 
@@ -20,7 +19,7 @@ Ayuda a que la aplicación crezca. Agregar funciones, pantallas o una API no vue
 | **Datos** | Describe y almacena la información que maneja la aplicación | Estructuras como una película, un usuario o un producto |
 | **Lógica** | Decide qué hacer con los datos y cómo reaccionar a las acciones del usuario | Filtrar resultados de una búsqueda, marcar favoritos, validar información |
 
-3. Problemas cuando una View concentra demasiadas responsabilidades
+## 3. Problemas cuando una View concentra demasiadas responsabilidades
 
 Es común que al inicio todo quede dentro de la View, y de ahí viene el llamado “Massive View”. Los problemas son:
 
@@ -31,19 +30,19 @@ Cambios riesgosos. Al mover un botón puedes dañar sin querer la lógica de al 
 Previews y mantenimiento más complicados, porque la vista depende de muchas cosas a la vez.
 Dificultad para integrar una API o una base de datos después, ya que la vista tendría que saber de dónde vienen los datos.
 
-4. ¿Qué es Model?
+## 4. ¿Qué es Model?
 
 El Model representa los datos y las reglas básicas del dominio de la app. No sabe nada de pantallas ni de botones: solo describe la información.
 
 En PeliQlas, Movie es un Model. Más adelante, si se agrega un perfil de usuario como estructura (Profile), también sería Model.|
 
-5. ¿Qué es View?
+## 5. ¿Qué es View?
 
 La View es la parte visible: muestra la información al usuario y recibe sus acciones (toques, texto, etc.). Debe ser lo más sencilla posible: no decide nada, solo dibuja lo que le dan y avisa cuando el usuario hace algo.
 
 En SwiftUI, las vistas son los struct que conforman a View: WelcomeView, MovieListView, MovieDetailView, PosterView.
 
-6. ¿Qué es ViewModel?
+## 6. ¿Qué es ViewModel?
 
 El ViewModel es el intermediario entre el Model y la View. Tiene tres funciones:
 
@@ -72,7 +71,7 @@ La View conoce al ViewModel y el ViewModel conoce al Model, pero **el ViewModel 
 4. La lista filtrada se publica y la **View** se actualiza para mostrar solo esas películas.
 
 
-9. Propuesta inicial de organización con MVVM
+## 9. Propuesta inicial de organización con MVVM
 Model
 Movie: título, año, géneros, calificación, director, actores e imagen.
 Profile: nombre del perfil de usuario.
