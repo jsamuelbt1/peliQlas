@@ -1,32 +1,21 @@
-//
-//  PeliQlasApp.swift
-//  PeliQlas
-//
-//  Created by José Samuel on 10/10/26.
-//
-
 import SwiftUI
-import SwiftData
 
-@main
+@main   // Indica que aquí empieza la app
 struct PeliQlasApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    // @StateObject: crea UNA sola instancia de AppState que vive mientras la app esté abierta.
+    @StateObject private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // NavigationStack: contenedor que maneja la pila de pantallas.
+            // Cada pantalla nueva se "apila" y el botón Atrás la quita.
+            NavigationStack {
+                WelcomeView()   // pantalla inicial
+            }
+            // Inyecta appState en TODAS las pantallas dentro del stack.
+            .environmentObject(appState)
+            .preferredColorScheme(.dark) 
         }
-        .modelContainer(sharedModelContainer)
     }
 }
