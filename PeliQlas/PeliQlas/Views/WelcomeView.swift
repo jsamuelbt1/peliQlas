@@ -59,5 +59,6 @@ struct WelcomeView: View {
             .padding(.horizontal)
         }
         .padding()
+
     }
 }
