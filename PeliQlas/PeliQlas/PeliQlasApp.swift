@@ -1,21 +1,19 @@
 import SwiftUI
 
-@main   // Indica que aquí empieza la app
+@main   // Punto de entrada de la app
 struct PeliQlasApp: App {
 
-    // @StateObject: crea UNA sola instancia de AppState que vive mientras la app esté abierta.
+    // Crea UNA sola instancia del estado compartido
     @StateObject private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
-            // NavigationStack: contenedor que maneja la pila de pantallas.
-            // Cada pantalla nueva se "apila" y el botón Atrás la quita.
+            // NavigationStack maneja la pila de pantallas
             NavigationStack {
-                WelcomeView()   // pantalla inicial
+                WelcomeView()   // Pantalla inicial
             }
-            // Inyecta appState en TODAS las pantallas dentro del stack.
-            .environmentObject(appState)
-            .preferredColorScheme(.dark) 
+            .environmentObject(appState)   // Comparte appState con todas las vistas
+            .preferredColorScheme(.dark)
         }
     }
 }

@@ -81,6 +81,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		65A7A36D30844FDA00578C6D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				65A7A35B307C493600578C6D /* Movie.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		65A7A36E30844FE600578C6D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				65A7A367307C4ABE00578C6D /* MovieListView.swift */,
+				65A7A369307C4ADF00578C6D /* MovieDetailView.swift */,
+				65A7A365307C4A9200578C6D /* WelcomeView.swift */,
+				65A7A35F307C49A000578C6D /* PosterView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		65A7A3703084500200578C6D /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				65A7A35D307C496400578C6D /* AppState.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		65C1D628307AF67F0091E49C = {
 			isa = PBXGroup;
 			children = (
@@ -104,13 +131,10 @@
 		65C1D633307AF67F0091E49C /* PeliQlas */ = {
 			isa = PBXGroup;
 			children = (
+				65A7A3703084500200578C6D /* ViewModels */,
+				65A7A36E30844FE600578C6D /* Views */,
+				65A7A36D30844FDA00578C6D /* Models */,
 				65C1D634307AF67F0091E49C /* PeliQlasApp.swift */,
-				65A7A35F307C49A000578C6D /* PosterView.swift */,
-				65A7A365307C4A9200578C6D /* WelcomeView.swift */,
-				65A7A367307C4ABE00578C6D /* MovieListView.swift */,
-				65A7A369307C4ADF00578C6D /* MovieDetailView.swift */,
-				65A7A35B307C493600578C6D /* Movie.swift */,
-				65A7A35D307C496400578C6D /* AppState.swift */,
 				65C1D63A307AF6820091E49C /* Assets.xcassets */,
 				65C1D63C307AF6820091E49C /* Preview Content */,
 			);
