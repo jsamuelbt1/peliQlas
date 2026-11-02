@@ -1,11 +1,13 @@
 import SwiftUI
+import SwiftData
 
 struct MovieDetailView: View {
 
     // La película llega desde la lista: así se "pasa información" entre vistas.
     let movie: Movie
 
-    @EnvironmentObject var appState: AppState
+    @Environment(\.modelContext) private var modelContext   // para guardar/borrar
+    @Query private var favorites: [FavoriteMovie]           // colección actual
 
     // dismiss: acción del sistema que cierra esta pantalla y regresa a la anterior.
     @Environment(\.dismiss) private var dismiss
@@ -52,9 +54,10 @@ struct MovieDetailView: View {
             // Corazón a la izquierda: marca/desmarca favorita en el estado compartido
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    appState.toggleFavorite(movie)
+                    // Agrega o quita de la colección persistida
+                    FavoritesManager.toggle(movie, favorites: favorites, context: modelContext)
                 } label: {
-                    Image(systemName: appState.isFavorite(movie) ? "heart.fill" : "heart")
+                    Image(systemName: FavoritesManager.isFavorite(movie, in: favorites) ? "heart.fill" : "heart")
                         .foregroundStyle(.red)
                 }
             }

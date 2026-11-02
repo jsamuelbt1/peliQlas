@@ -1,18 +1,19 @@
 import SwiftUI
+import SwiftData
 
 struct MovieListView: View {
 
     @EnvironmentObject var appState: AppState
-
-    // @StateObject: esta vista CREA el ViewModel y lo conserva mientras exista.
     @StateObject private var viewModel = MovieListViewModel()
-    
+
+    // @Query: lee los favoritos guardados y la vista se actualiza sola
+    // cada vez que la colección cambia.
+    @Query private var favorites: [FavoriteMovie]
+
     var body: some View {
         List {
             Section(header: Text("Hola, \(appState.currentProfile) · Populares")) {
                 ForEach(viewModel.filteredMovies) { movie in
-
-                    // Al tocar la fila, se apila MovieDetailView y se le pasa la película
                     NavigationLink {
                         MovieDetailView(movie: movie)
                     } label: {
@@ -33,8 +34,10 @@ struct MovieListView: View {
 
                             Spacer()
 
-                            Image(systemName: appState.isFavorite(movie) ? "heart.fill" : "heart")
-                                .foregroundStyle(appState.isFavorite(movie) ? .red : .secondary)
+                            // Corazón según lo que hay guardado en SwiftData
+                            let isFav = FavoritesManager.isFavorite(movie, in: favorites)
+                            Image(systemName: isFav ? "heart.fill" : "heart")
+                                .foregroundStyle(isFav ? .red : .secondary)
                         }
                     }
                 }
@@ -42,5 +45,15 @@ struct MovieListView: View {
         }
         .navigationTitle("Películas")
         .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
+        .toolbar {
+            // Acceso a la colección personal
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    FavoritesView()
+                } label: {
+                    Image(systemName: "heart.text.square")
+                }
+            }
+        }
     }
 }
