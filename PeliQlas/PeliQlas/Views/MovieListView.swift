@@ -4,24 +4,13 @@ struct MovieListView: View {
 
     @EnvironmentObject var appState: AppState
 
-    // @State: variable propia de esta vista; al cambiar, la vista se redibuja.
-    @State private var searchText = ""
-
-    let movies = Movie.samples
-
-    // Propiedad calculada: si no hay texto muestra todas;
-    // si hay, filtra por título (sin importar mayúsculas/minúsculas).
-    var filteredMovies: [Movie] {
-        if searchText.isEmpty {
-            return movies
-        }
-        return movies.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
-    }
-
+    // @StateObject: esta vista CREA el ViewModel y lo conserva mientras exista.
+    @StateObject private var viewModel = MovieListViewModel()
+    
     var body: some View {
         List {
             Section(header: Text("Hola, \(appState.currentProfile) · Populares")) {
-                ForEach(filteredMovies) { movie in
+                ForEach(viewModel.filteredMovies) { movie in
 
                     // Al tocar la fila, se apila MovieDetailView y se le pasa la película
                     NavigationLink {
@@ -52,6 +41,6 @@ struct MovieListView: View {
             }
         }
         .navigationTitle("Películas")
-        .searchable(text: $searchText, prompt: "Buscar películas...")
+        .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
     }
 }
