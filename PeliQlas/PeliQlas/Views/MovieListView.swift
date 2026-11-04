@@ -1,29 +1,19 @@
 import SwiftUI
+import SwiftData
 
 struct MovieListView: View {
 
     @EnvironmentObject var appState: AppState
+    @StateObject private var viewModel = MovieListViewModel()
 
-    // @State: variable propia de esta vista; al cambiar, la vista se redibuja.
-    @State private var searchText = ""
-
-    let movies = Movie.samples
-
-    // Propiedad calculada: si no hay texto muestra todas;
-    // si hay, filtra por título (sin importar mayúsculas/minúsculas).
-    var filteredMovies: [Movie] {
-        if searchText.isEmpty {
-            return movies
-        }
-        return movies.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
-    }
+    // @Query: lee los favoritos guardados y la vista se actualiza sola
+    // cada vez que la colección cambia.
+    @Query private var favorites: [FavoriteMovie]
 
     var body: some View {
         List {
             Section(header: Text("Hola, \(appState.currentProfile) · Populares")) {
-                ForEach(filteredMovies) { movie in
-
-                    // Al tocar la fila, se apila MovieDetailView y se le pasa la película
+                ForEach(viewModel.filteredMovies) { movie in
                     NavigationLink {
                         MovieDetailView(movie: movie)
                     } label: {
@@ -44,14 +34,26 @@ struct MovieListView: View {
 
                             Spacer()
 
-                            Image(systemName: appState.isFavorite(movie) ? "heart.fill" : "heart")
-                                .foregroundStyle(appState.isFavorite(movie) ? .red : .secondary)
+                            // Corazón según lo que hay guardado en SwiftData
+                            let isFav = FavoritesManager.isFavorite(movie, in: favorites)
+                            Image(systemName: isFav ? "heart.fill" : "heart")
+                                .foregroundStyle(isFav ? .red : .secondary)
                         }
                     }
                 }
             }
         }
         .navigationTitle("Películas")
-        .searchable(text: $searchText, prompt: "Buscar películas...")
+        .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
+        .toolbar {
+            // Acceso a la colección personal
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    FavoritesView()
+                } label: {
+                    Image(systemName: "heart.text.square")
+                }
+            }
+        }
     }
 }

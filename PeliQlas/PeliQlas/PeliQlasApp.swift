@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main   // Punto de entrada de la app
 struct PeliQlasApp: App {
@@ -14,6 +15,7 @@ struct PeliQlasApp: App {
             }
             .environmentObject(appState)   // Comparte appState con todas las vistas
             .preferredColorScheme(.dark)
+            .modelContainer(for: FavoriteMovie.self)
         }
     }
 }
