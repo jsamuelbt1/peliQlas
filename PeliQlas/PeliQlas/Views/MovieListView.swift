@@ -45,6 +45,16 @@ struct MovieListView: View {
                     Task { await viewModel.loadMovies() }
                 }
             }
+        case .empty:
+            ContentUnavailableView {
+                Label("Sin películas", systemImage: "film")
+            } description: {
+                Text("La consulta fue exitosa, pero no hay películas para mostrar.")
+            } actions: {
+                Button("Actualizar") {
+                    Task { await viewModel.loadMovies() }
+                }
+            }
 
         case .loaded:
             movieList
@@ -83,10 +93,10 @@ struct MovieListView: View {
                 }
             }
         }
-        // Si la búsqueda no encuentra nada, mensaje en lugar de lista vacía
         .overlay {
-            if viewModel.filteredMovies.isEmpty {
+            if viewModel.filteredMovies.isEmpty && !viewModel.searchText.isEmpty {
                 ContentUnavailableView.search(text: viewModel.searchText)
+        
             }
         }
     }

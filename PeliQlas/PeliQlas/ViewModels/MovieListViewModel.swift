@@ -7,6 +7,7 @@ enum ViewState: Equatable {
     case idle                  // aún no se ha consultado
     case loading               // consultando la API
     case loaded([Movie])       // éxito: trae las películas
+    case empty                 // NUEVO: consulta exitosa, pero sin resultados
     case failed(String)        // error: trae el mensaje para el usuario
 }
 
@@ -63,8 +64,8 @@ class MovieListViewModel: ObservableObject {
         state = .loading
         do {
             let dtos = try await service.fetchPopularMovies()
-            // Convierte DTO -> Movie: la View nunca ve el JSON
-            state = .loaded(dtos.map { Movie(dto: $0) })
+            let movies = dtos.map { Movie(dto: $0) }
+            state = movies.isEmpty ? .empty : .loaded(movies)
         } catch let error as APIError {
             if case .cancelled = error {
                 state = .idle    // la tarea se canceló: se podrá reintentar al volver

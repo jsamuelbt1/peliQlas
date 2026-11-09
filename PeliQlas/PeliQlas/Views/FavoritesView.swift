@@ -34,7 +34,7 @@ struct FavoritesView: View {
                 for index in offsets {
                     modelContext.delete(favorites[index])
                 }
-                try? modelContext.save()
+                do { try modelContext.save() } catch { print("No se pudo eliminar:", error) }
             }
         }
         .navigationTitle("Mis favoritas")
