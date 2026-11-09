@@ -1,38 +1,102 @@
 import SwiftUI
 import SwiftData
 
-struct ProfileView: View {
-
-    // El nombre se guarda en el dispositivo y sigue ahí al reabrir la app.
-    @AppStorage("profileName") private var profileName = "Álex"
-
-    // Para mostrar cuántas favoritas hay guardadas.
-    @Query private var favorites: [FavoriteMovie]
+// Avatar circular: muestra la foto si existe; si no, la inicial del nombre.
+struct ProfileAvatarView: View {
+    let photoData: Data
+    let name: String
+    let size: CGFloat
 
     var body: some View {
-        Form {
-            // Avatar con la inicial del nombre
-            Section {
-                HStack {
-                    Spacer()
-                    Text(String(profileName.prefix(1)).uppercased())
-                        .font(.largeTitle).bold()
-                        .frame(width: 90, height: 90)
-                        .background(Color.red.opacity(0.25))
-                        .clipShape(RoundedRectangle(cornerRadius: 22))
-                    Spacer()
+        Group {
+            if let image = UIImage(data: photoData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                ZStack {
+                    Color.red.opacity(0.25)
+                    Text(String(name.prefix(1)).uppercased())
+                        .font(.system(size: size * 0.4, weight: .bold))
                 }
-                .listRowBackground(Color.clear)
-            }
-
-            Section("Nombre del perfil") {
-                TextField("Tu nombre", text: $profileName)
-            }
-
-            Section("Mi colección") {
-                LabeledContent("Películas favoritas", value: "\(favorites.count)")
             }
         }
-        .navigationTitle("Perfil")
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .overlay(Circle().stroke(Color.secondary.opacity(0.4), lineWidth: 1))
+    }
+}
+
+struct ProfileView: View {
+
+    @AppStorage("profileName") private var profileName = "Álex"
+    @AppStorage("profilePhoto") private var profilePhoto = Data()
+
+    // Favoritas, de la más reciente a la más antigua.
+    @Query(sort: \FavoriteMovie.dateAdded, order: .reverse)
+    private var favorites: [FavoriteMovie]
+
+    @State private var showingEdit = false
+
+    // Cuadrícula que se adapta: ~3 columnas en iPhone.
+    private let columns = [GridItem(.adaptive(minimum: 100), spacing: 12)]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+
+                // Solo la foto, centrada
+                HStack {
+                    Spacer()
+                    ProfileAvatarView(photoData: profilePhoto, name: profileName, size: 120)
+                    Spacer()
+                }
+
+                Divider()
+
+                Text("FAVORITAS")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+
+                if favorites.isEmpty {
+                    Text("Marca una película con el corazón para verla aquí.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(favorites) { favorite in
+                            // Tocar una portada abre el detalle
+                            NavigationLink {
+                                MovieDetailView(movie: favorite.movie)
+                            } label: {
+                                PosterView(
+                                    imageName: favorite.imageName,
+                                    posterURL: favorite.posterURLString.flatMap { URL(string: $0) })
+                                .aspectRatio(2/3, contentMode: .fit)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .padding()
+        }
+        .navigationBarTitleDisplayMode(.inline)   // sin título "Perfil"
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingEdit = true
+                } label: {
+                    Image(systemName: "pencil")
+                }
+            }
+        }
+        // Hoja emergente para editar
+        .sheet(isPresented: $showingEdit) {
+            EditProfileView()
+        }
     }
 }
