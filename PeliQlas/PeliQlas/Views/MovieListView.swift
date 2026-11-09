@@ -5,12 +5,53 @@ struct MovieListView: View {
 
     @EnvironmentObject var appState: AppState
     @StateObject private var viewModel = MovieListViewModel()
-
-    // @Query: lee los favoritos guardados y la vista se actualiza sola
-    // cada vez que la colección cambia.
     @Query private var favorites: [FavoriteMovie]
 
     var body: some View {
+        content
+            .navigationTitle("Películas")
+            .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        FavoritesView()
+                    } label: {
+                        Image(systemName: "heart.text.square")
+                    }
+                }
+            }
+            // .task se ejecuta al aparecer la vista y admite async/await.
+            // La View solo dice "carga"; no sabe nada de URLSession.
+            .task {
+                await viewModel.loadIfNeeded()
+            }
+    }
+
+    // Qué se dibuja depende SOLO del estado del ViewModel.
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            ProgressView("Cargando películas...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+        case .failed(let message):
+            ContentUnavailableView {
+                Label("No se pudo cargar", systemImage: "wifi.exclamationmark")
+            } description: {
+                Text(message)
+            } actions: {
+                Button("Reintentar") {
+                    Task { await viewModel.loadMovies() }
+                }
+            }
+
+        case .loaded:
+            movieList
+        }
+    }
+
+    private var movieList: some View {
         List {
             Section(header: Text("Hola, \(appState.currentProfile) · Populares")) {
                 ForEach(viewModel.filteredMovies) { movie in
@@ -18,7 +59,7 @@ struct MovieListView: View {
                         MovieDetailView(movie: movie)
                     } label: {
                         HStack(spacing: 12) {
-                            PosterView(imageName: movie.imageName)
+                            PosterView(imageName: movie.imageName, posterURL: movie.posterURL)
                                 .frame(width: 60, height: 90)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -34,7 +75,6 @@ struct MovieListView: View {
 
                             Spacer()
 
-                            // Corazón según lo que hay guardado en SwiftData
                             let isFav = FavoritesManager.isFavorite(movie, in: favorites)
                             Image(systemName: isFav ? "heart.fill" : "heart")
                                 .foregroundStyle(isFav ? .red : .secondary)
@@ -43,16 +83,10 @@ struct MovieListView: View {
                 }
             }
         }
-        .navigationTitle("Películas")
-        .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
-        .toolbar {
-            // Acceso a la colección personal
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink {
-                    FavoritesView()
-                } label: {
-                    Image(systemName: "heart.text.square")
-                }
+        // Si la búsqueda no encuentra nada, mensaje en lugar de lista vacía
+        .overlay {
+            if viewModel.filteredMovies.isEmpty {
+                ContentUnavailableView.search(text: viewModel.searchText)
             }
         }
     }

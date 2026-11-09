@@ -16,7 +16,7 @@ struct MovieDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                PosterView(imageName: movie.imageName)
+                PosterView(imageName: movie.imageName, posterURL: movie.posterURL)
                     .frame(height: 380)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .frame(maxWidth: .infinity)  // centra el póster
