@@ -1,21 +1,13 @@
 import SwiftUI
 import SwiftData
 
-@main   // Punto de entrada de la app
+@main
 struct PeliQlasApp: App {
-
-    // Crea UNA sola instancia del estado compartido
-    @StateObject private var appState = AppState()
-
     var body: some Scene {
         WindowGroup {
-            // NavigationStack maneja la pila de pantallas
-            NavigationStack {
-                WelcomeView()   // Pantalla inicial
-            }
-            .environmentObject(appState)   // Comparte appState con todas las vistas
-            .preferredColorScheme(.dark)
-            .modelContainer(for: FavoriteMovie.self)
+            MainTabView()   // ya no hay pantalla de bienvenida
+                .preferredColorScheme(.dark)
+                .modelContainer(for: FavoriteMovie.self)
         }
     }
 }
