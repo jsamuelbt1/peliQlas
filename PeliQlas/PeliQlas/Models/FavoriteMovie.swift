@@ -18,6 +18,7 @@ final class FavoriteMovie {
     var actors: String
     var imageName: String
     var dateAdded: Date   // cuándo se agregó (sirve para ordenar)
+    var posterURLString: String?   // NUEVO (opcional, para no romper datos ya guardados)
 
     // Crea el registro a partir de una Movie normal.
     init(from movie: Movie) {
@@ -30,6 +31,7 @@ final class FavoriteMovie {
         self.actors = movie.actors
         self.imageName = movie.imageName
         self.dateAdded = Date()
+        self.posterURLString = movie.posterURL?.absoluteString
     }
 
     // Convierte el registro guardado de vuelta a Movie,
@@ -37,6 +39,8 @@ final class FavoriteMovie {
     var movie: Movie {
         Movie(id: movieID, title: title, year: year, genres: genres,
               rating: rating, director: director, actors: actors,
-              imageName: imageName)
+              imageName: imageName,
+              posterURL: posterURLString.flatMap { URL(string: $0) })
+
     }
 }

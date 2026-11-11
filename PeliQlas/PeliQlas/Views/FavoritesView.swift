@@ -16,7 +16,8 @@ struct FavoritesView: View {
                     MovieDetailView(movie: favorite.movie)
                 } label: {
                     HStack(spacing: 12) {
-                        PosterView(imageName: favorite.imageName)
+                        PosterView(imageName: favorite.imageName,
+                                   posterURL: favorite.posterURLString.flatMap { URL(string: $0) })
                             .frame(width: 50, height: 75)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         VStack(alignment: .leading) {
@@ -33,7 +34,7 @@ struct FavoritesView: View {
                 for index in offsets {
                     modelContext.delete(favorites[index])
                 }
-                try? modelContext.save()
+                do { try modelContext.save() } catch { print("No se pudo eliminar:", error) }
             }
         }
         .navigationTitle("Mis favoritas")

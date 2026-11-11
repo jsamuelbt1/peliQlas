@@ -3,57 +3,60 @@ import SwiftData
 
 struct MovieListView: View {
 
-    @EnvironmentObject var appState: AppState
-    @StateObject private var viewModel = MovieListViewModel()
+    // @AppStorage: guarda el nombre en UserDefaults. Lo edita ProfileView y aquí solo se lee.
+    @AppStorage("profileName") private var profileName = "Álex"
 
-    // @Query: lee los favoritos guardados y la vista se actualiza sola
-    // cada vez que la colección cambia.
+    @StateObject private var viewModel = MovieListViewModel()
     @Query private var favorites: [FavoriteMovie]
 
     var body: some View {
-        List {
-            Section(header: Text("Hola, \(appState.currentProfile) · Populares")) {
-                ForEach(viewModel.filteredMovies) { movie in
-                    NavigationLink {
-                        MovieDetailView(movie: movie)
-                    } label: {
-                        HStack(spacing: 12) {
-                            PosterView(imageName: movie.imageName)
-                                .frame(width: 60, height: 90)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+        content
+            .navigationTitle("Populares")
+            // La View solo dice "carga"; no sabe nada de HTTP.
+            .task { await viewModel.loadIfNeeded() }
+    }
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(movie.title).font(.headline)
-                                Text("\(movie.year) • \(movie.genres)")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                Label(String(format: "%.1f", movie.rating), systemImage: "star.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.yellow)
-                            }
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            ProgressView("Cargando películas...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                            Spacer()
+        case .failed(let message):
+            ContentUnavailableView {
+                Label("No se pudo cargar", systemImage: "wifi.exclamationmark")
+            } description: {
+                Text(message)
+            } actions: {
+                Button("Reintentar") { Task { await viewModel.loadMovies() } }
+            }
 
-                            // Corazón según lo que hay guardado en SwiftData
-                            let isFav = FavoritesManager.isFavorite(movie, in: favorites)
-                            Image(systemName: isFav ? "heart.fill" : "heart")
-                                .foregroundStyle(isFav ? .red : .secondary)
+        case .empty:
+            ContentUnavailableView {
+                Label("Sin películas", systemImage: "film")
+            } description: {
+                Text("La consulta fue exitosa, pero no hay películas para mostrar.")
+            } actions: {
+                Button("Actualizar") { Task { await viewModel.loadMovies() } }
+            }
+
+        case .loaded:
+            List {
+                Section(header: Text("Hola, \(profileName)")) {
+                    ForEach(viewModel.filteredMovies) { movie in
+                        NavigationLink {
+                            MovieDetailView(movie: movie)
+                        } label: {
+                            MovieRowView(
+                                movie: movie,
+                                isFavorite: FavoritesManager.isFavorite(movie, in: favorites))
                         }
                     }
                 }
             }
-        }
-        .navigationTitle("Películas")
-        .searchable(text: $viewModel.searchText, prompt: "Buscar películas...")
-        .toolbar {
-            // Acceso a la colección personal
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink {
-                    FavoritesView()
-                } label: {
-                    Image(systemName: "heart.text.square")
-                }
-            }
+            // Jalar hacia abajo para actualizar
+            .refreshable { await viewModel.loadMovies() }
         }
     }
 }

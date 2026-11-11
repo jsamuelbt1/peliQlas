@@ -1,21 +1,26 @@
 import SwiftUI
 import SwiftData
 
-@main   // Punto de entrada de la app
+@main
 struct PeliQlasApp: App {
 
-    // Crea UNA sola instancia del estado compartido
-    @StateObject private var appState = AppState()
+    // Preferencia de tema guardada en el dispositivo: "system", "light" o "dark".
+    @AppStorage("appearance") private var appearance = "system"
+
+    // nil = usar el tema del sistema.
+    private var colorScheme: ColorScheme? {
+        switch appearance {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
-            // NavigationStack maneja la pila de pantallas
-            NavigationStack {
-                WelcomeView()   // Pantalla inicial
-            }
-            .environmentObject(appState)   // Comparte appState con todas las vistas
-            .preferredColorScheme(.dark)
-            .modelContainer(for: FavoriteMovie.self)
+            MainTabView()
+                .preferredColorScheme(colorScheme)
+                .modelContainer(for: FavoriteMovie.self)
         }
     }
 }
