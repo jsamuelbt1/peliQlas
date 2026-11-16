@@ -1,23 +1,39 @@
 import SwiftUI
 
-// Contenedor principal: la barra inferior con las 4 pestañas.
-// Cada pestaña tiene su PROPIO NavigationStack, así cada una mantiene
-// su pila de pantallas (lista -> detalle) de forma independiente.
 struct MainTabView: View {
+
+    // Único ViewModel de las películas populares: lo comparten
+    // la pestaña Populares y la vista Cover Flow.
+    @StateObject private var popularViewModel = MovieListViewModel()
+
     var body: some View {
-        TabView {
-            NavigationStack { MovieListView() }
-                .tabItem { Label("Populares", systemImage: "flame.fill") }
+        // GeometryReader mide la pantalla: si es más ancha que alta, está en horizontal.
+        GeometryReader { geo in
+            let isLandscape = geo.size.width > geo.size.height
 
-            NavigationStack { FavoritesView() }
-                .tabItem { Label("Favoritas", systemImage: "heart.fill") }
+            ZStack {
+                TabView {
+                    NavigationStack { MovieListView(viewModel: popularViewModel) }
+                        .tabItem { Label("Populares", systemImage: "flame.fill") }
 
-            NavigationStack { ProfileView() }
-                .tabItem { Label("Perfil", systemImage: "person.fill") }
+                    NavigationStack { FavoritesView() }
+                        .tabItem { Label("Favoritas", systemImage: "heart.fill") }
 
-            NavigationStack { SearchView() }
-                .tabItem { Label("Buscar", systemImage: "magnifyingglass") }
+                    NavigationStack { ProfileView() }
+                        .tabItem { Label("Perfil", systemImage: "person.fill") }
+
+                    NavigationStack { SearchView() }
+                        .tabItem { Label("Buscar", systemImage: "magnifyingglass") }
+                }
+                .tint(.red)
+
+                // Cover Flow encima del TabView solo en horizontal.
+                if isLandscape {
+                    CoverFlowView(viewModel: popularViewModel)
+                        .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut, value: isLandscape)
         }
-        .tint(.red)   // color de la pestaña seleccionada, como en tu referencia
     }
 }
