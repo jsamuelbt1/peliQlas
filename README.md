@@ -212,7 +212,6 @@ Todo se almacena en el dispositivo y se conserva al cerrar la app. Los errores d
 
 Las pruebas unitarias (`PeliQlasTests`, XCTest) no dependen de internet: usan datos fijos y un `MockMovieService`. Cubren la búsqueda por título (caso normal, límite y sin resultados), los estados de carga (éxito, error HTTP, sin conexión y vacío), la búsqueda con la API y la lógica de selección del Cover Flow. Se ejecutan con `⌘U`.
 
-<img src="docs/screenshots/tests.png" width="600" alt="Pruebas unitarias en verde">
 
 ### Limitaciones conocidas
 
