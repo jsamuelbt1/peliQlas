@@ -2,38 +2,42 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    // Único ViewModel de las películas populares: lo comparten
-    // la pestaña Populares y la vista Cover Flow.
+    // Único ViewModel de las populares: lo comparten la lista y el Cover Flow.
     @StateObject private var popularViewModel = MovieListViewModel()
 
     var body: some View {
-        // GeometryReader mide la pantalla: si es más ancha que alta, está en horizontal.
+        // Si es más ancha que alta, el dispositivo está en horizontal.
         GeometryReader { geo in
             let isLandscape = geo.size.width > geo.size.height
 
-            ZStack {
-                TabView {
-                    NavigationStack { MovieListView(viewModel: popularViewModel) }
-                        .tabItem { Label("Populares", systemImage: "flame.fill") }
-
-                    NavigationStack { FavoritesView() }
-                        .tabItem { Label("Favoritas", systemImage: "heart.fill") }
-
-                    NavigationStack { ProfileView() }
-                        .tabItem { Label("Perfil", systemImage: "person.fill") }
-
-                    NavigationStack { SearchView() }
-                        .tabItem { Label("Buscar", systemImage: "magnifyingglass") }
+            TabView {
+                // En horizontal, el contenido de la pestaña cambia a Cover Flow,
+                // pero la barra inferior sigue visible.
+                Group {
+                    if isLandscape {
+                        CoverFlowView(viewModel: popularViewModel)
+                    } else {
+                        NavigationStack { MovieListView(viewModel: popularViewModel) }
+                    }
                 }
-                .tint(.red)
+                .tabItem { Label("Populares", systemImage: "flame.fill") }
 
-                // Cover Flow encima del TabView solo en horizontal.
-                if isLandscape {
-                    CoverFlowView(viewModel: popularViewModel)
-                        .transition(.opacity)
+                Group {
+                    if isLandscape {
+                        FavoritesCoverFlowView()
+                    } else {
+                        NavigationStack { FavoritesView() }
+                    }
                 }
+                .tabItem { Label("Favoritas", systemImage: "heart.fill") }
+
+                NavigationStack { ProfileView() }
+                    .tabItem { Label("Perfil", systemImage: "person.fill") }
+
+                NavigationStack { SearchView() }
+                    .tabItem { Label("Buscar", systemImage: "magnifyingglass") }
             }
-            .animation(.easeInOut, value: isLandscape)
+            .tint(.red)
         }
     }
 }

@@ -1,49 +1,26 @@
 import SwiftUI
 import SwiftData
 
-struct CoverFlowView: View {
+// COMPONENTE REUTILIZABLE: carrusel + detalle para CUALQUIER lista de películas.
+// No sabe de dónde vienen (API o favoritas): solo recibe `movies`.
+struct CoverFlowBrowser: View {
 
-    // Datos: ViewModel compartido con Populares (lo crea MainTabView).
-    @ObservedObject var viewModel: MovieListViewModel
-    // Lógica de selección: este ViewModel pertenece solo a esta vista.
+    let movies: [Movie]
+    // Lógica de selección: cada pantalla tiene su propia instancia.
     @StateObject private var coverFlow = CoverFlowViewModel()
-    // Namespace: permite animar el MISMO póster del carrusel al detalle.
     @Namespace private var posterSpace
 
     var body: some View {
-        ZStack {
-            Color(.systemBackground).ignoresSafeArea()
-
-            switch viewModel.state {
-            case .idle, .loading:
-                ProgressView("Cargando películas...")
-
-            case .failed(let message):
-                ContentUnavailableView {
-                    Label("No se pudo cargar", systemImage: "wifi.exclamationmark")
-                } description: {
-                    Text(message)
-                } actions: {
-                    Button("Reintentar") { Task { await viewModel.loadMovies() } }
-                }
-
-            case .empty:
-                ContentUnavailableView("Sin películas", systemImage: "film")
-
-            case .loaded(let movies):
-                if let movie = coverFlow.selectedMovie {
-                    detail(movie)
-                } else {
-                    carousel(movies)
-                }
-            }
+        if let movie = coverFlow.selectedMovie {
+            detail(movie)
+        } else {
+            carousel
         }
-        .task { await viewModel.loadIfNeeded() }
     }
 
     // MARK: - Carrusel
 
-    private func carousel(_ movies: [Movie]) -> some View {
+    private var carousel: some View {
         GeometryReader { geo in
             let posterHeight = geo.size.height * 0.62
             let posterWidth = posterHeight * 2 / 3
@@ -64,7 +41,6 @@ struct CoverFlowView: View {
                                                           perspective: 0.5)
                                         .scaleEffect(phase.isIdentity ? 1 : 0.85)
                                 }
-                                // La View solo AVISA del toque; la decisión es del ViewModel.
                                 .onTapGesture {
                                     withAnimation(.spring(duration: 0.5)) {
                                         coverFlow.handleTap(on: movie, in: movies)
@@ -77,10 +53,9 @@ struct CoverFlowView: View {
                 .contentMargins(.horizontal, (geo.size.width - posterWidth) / 2,
                                 for: .scrollContent)
                 .scrollTargetBehavior(.viewAligned)
-                .scrollPosition(id: $coverFlow.centeredID)   // el scroll escribe en el ViewModel
+                .scrollPosition(id: $coverFlow.centeredID)
                 .frame(height: posterHeight + 20)
 
-                // Título de la película centrada
                 if let current = coverFlow.currentMovie(in: movies) {
                     VStack(spacing: 2) {
                         Text(current.title).font(.headline)
@@ -111,6 +86,63 @@ struct CoverFlowView: View {
             .frame(maxWidth: .infinity)
         }
         .padding()
+    }
+}
+
+// POPULARES: maneja los estados de la consulta y delega el dibujo al componente.
+struct CoverFlowView: View {
+
+    @ObservedObject var viewModel: MovieListViewModel
+
+    var body: some View {
+        ZStack {
+            Color(.systemBackground).ignoresSafeArea()
+
+            switch viewModel.state {
+            case .idle, .loading:
+                ProgressView("Cargando películas...")
+
+            case .failed(let message):
+                ContentUnavailableView {
+                    Label("No se pudo cargar", systemImage: "wifi.exclamationmark")
+                } description: {
+                    Text(message)
+                } actions: {
+                    Button("Reintentar") { Task { await viewModel.loadMovies() } }
+                }
+
+            case .empty:
+                ContentUnavailableView("Sin películas", systemImage: "film")
+
+            case .loaded(let movies):
+                CoverFlowBrowser(movies: movies)
+            }
+        }
+        .task { await viewModel.loadIfNeeded() }
+    }
+}
+
+// FAVORITAS: lee la colección de SwiftData y usa el mismo componente.
+struct FavoritesCoverFlowView: View {
+
+    // Más reciente primero. Se actualiza sola al agregar o quitar favoritas.
+    @Query(sort: \FavoriteMovie.dateAdded, order: .reverse)
+    private var favorites: [FavoriteMovie]
+
+    var body: some View {
+        ZStack {
+            Color(.systemBackground).ignoresSafeArea()
+
+            if favorites.isEmpty {
+                ContentUnavailableView(
+                    "Sin favoritas",
+                    systemImage: "heart",
+                    description: Text("Marca una película con el corazón para verla aquí."))
+            } else {
+                // FavoriteMovie.movie la convierte a Movie, que es lo que espera el componente.
+                CoverFlowBrowser(movies: favorites.map { $0.movie })
+            }
+        }
     }
 }
 // Panel derecho: reutiliza MovieDetailViewModel para traer director, actores y sinopsis.
