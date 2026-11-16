@@ -16,6 +16,7 @@ extension Movie {
             director: "",
             actors: "",
             imageName: "",
+            overview: dto.overview ?? "",
             posterURL: dto.posterPath.flatMap { URL(string: APIConfig.imageBaseURL + $0) }
         )
     }
@@ -55,6 +56,7 @@ extension Movie {
             director: directorName ?? "",
             actors: actorNames.joined(separator: ", "),
             imageName: imageName,
+            overview: (dto.overview ?? "").isEmpty ? overview : (dto.overview ?? ""),
             posterURL: posterURL
         )
     }

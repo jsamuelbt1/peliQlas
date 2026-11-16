@@ -11,8 +11,9 @@ struct Movie: Identifiable, Hashable {
     let rating: Double
     let director: String
     let actors: String
-    let imageName: String   
-    var posterURL: URL? = nil   
+    let imageName: String
+    var overview: String = ""
+    var posterURL: URL? = nil
 }
 
 // Datos de ejemplo (sin API). `static` significa que se accede con Movie.samples
