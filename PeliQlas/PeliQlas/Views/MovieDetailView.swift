@@ -36,6 +36,7 @@ struct MovieDetailView: View {
                     infoRow(title: "Año de estreno", value: String(movie.year))
                     infoRow(title: "Director", value: movie.director)
                     infoRow(title: "Actores", value: movie.actors)
+                    infoRow(title: "Sinopsis", value: movie.overview)
 
                     // Mientras llegan los datos o si falló la consulta
                     if viewModel.isLoading {

@@ -5,8 +5,7 @@ struct MovieListView: View {
 
     // @AppStorage: guarda el nombre en UserDefaults. Lo edita ProfileView y aquí solo se lee.
     @AppStorage("profileName") private var profileName = "Álex"
-
-    @StateObject private var viewModel = MovieListViewModel()
+    @ObservedObject var viewModel: MovieListViewModel
     @Query private var favorites: [FavoriteMovie]
 
     var body: some View {
